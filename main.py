@@ -1,12 +1,12 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, simpledialog
 import sympy as sp
 
 class MatdasKalkulator:
     def __init__(self, root):
         self.root = root
         self.root.title("Matdas Kalkulator")
-        self.root.geometry("400x550")
+        self.root.geometry("400x600")
         self.root.resizable(False, False)
 
         # Layar Kalkulator
@@ -57,9 +57,11 @@ class MatdasKalkulator:
 
         btn_solve = tk.Button(self.root, text='Cari x (=0)', font=('Arial', 16, 'bold'), bg='#cc99ff', command=self.button_solve)
         btn_solve.grid(row=7, column=2, columnspan=2, sticky="nsew", padx=3, pady=3)
+        btn_substitute = tk.Button(self.root, text='Substitusi Nilai x', font=('Arial', 16, 'bold'), bg='#ffff99', command=self.button_substitute)
+        btn_substitute.grid(row=8, column=0, columnspan=4, sticky="nsew", padx=3, pady=3)
 
         # Konfigurasi grid agar rapi
-        for i in range(8):
+        for i in range(9):
             self.root.grid_rowconfigure(i, weight=1)
         for i in range(4):
             self.root.grid_columnconfigure(i, weight=1)
@@ -130,6 +132,21 @@ class MatdasKalkulator:
         except Exception as e:
             messagebox.showerror("Error", "Gagal menghitung Turunan! Pastikan ekspresi valid.")
 
+    def button_substitute(self):
+        expr_str = self.display_var.get()
+        if not expr_str:
+            return
+        val_str = simpledialog.askstring("Input", "Masukkan nilai x:")
+        if val_str is None or val_str.strip() == "":
+            return
+        try:
+            x = sp.Symbol('x')
+            val = sp.sympify(val_str)
+            expr = self.get_parsed_expr(expr_str)
+            result = expr.subs(x, val)
+            self.display_var.set(self.format_result(result))
+        except Exception as e:
+            messagebox.showerror("Error", "Gagal melakukan substitusi! Pastikan nilai x valid.")
     def button_solve(self):
         expr_str = self.display_var.get()
         if not expr_str:
