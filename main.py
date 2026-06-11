@@ -53,7 +53,10 @@ class MatdasKalkulator:
         btn_derivative.grid(row=6, column=2, columnspan=2, sticky="nsew", padx=3, pady=3)
 
         btn_equal = tk.Button(self.root, text='Hitung (=)', font=('Arial', 16, 'bold'), bg='#99ff99', command=self.button_equal)
-        btn_equal.grid(row=7, column=0, columnspan=4, sticky="nsew", padx=3, pady=3)
+        btn_equal.grid(row=7, column=0, columnspan=2, sticky="nsew", padx=3, pady=3)
+
+        btn_solve = tk.Button(self.root, text='Cari x (=0)', font=('Arial', 16, 'bold'), bg='#cc99ff', command=self.button_solve)
+        btn_solve.grid(row=7, column=2, columnspan=2, sticky="nsew", padx=3, pady=3)
 
         # Konfigurasi grid agar rapi
         for i in range(8):
@@ -126,6 +129,29 @@ class MatdasKalkulator:
             self.display_var.set(self.format_result(result))
         except Exception as e:
             messagebox.showerror("Error", "Gagal menghitung Turunan! Pastikan ekspresi valid.")
+
+    def button_solve(self):
+        expr_str = self.display_var.get()
+        if not expr_str:
+            return
+        try:
+            x = sp.Symbol('x')
+            expr = self.get_parsed_expr(expr_str)
+            
+            if any(sym != x for sym in expr.free_symbols):
+                messagebox.showerror("Error", "Hanya variabel 'x' yang diizinkan untuk dikalkulasi!")
+                return
+                
+            # Mencari nilai x saat expr = 0
+            roots = sp.solve(expr, x)
+            if not roots:
+                self.display_var.set("Tidak ada solusi real")
+            else:
+                # Format hasil agar rapi jika ada beberapa akar
+                res_str = ", ".join(self.format_result(r) for r in roots)
+                self.display_var.set(f"x = {res_str}")
+        except Exception as e:
+            messagebox.showerror("Error", "Gagal mencari nilai x! Pastikan ekspresi valid.")
 
 if __name__ == "__main__":
     root = tk.Tk()
